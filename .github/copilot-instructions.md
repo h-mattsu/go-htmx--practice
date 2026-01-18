@@ -15,13 +15,52 @@
 ├── infrastructure/repository/ # データアクセス層
 ├── presentation/
 │   ├── handlers/           # HTTPハンドラー
-│   ├── router.go          # ルーティング設定
+│   │   ├── handler.go     # すべてのハンドラーをまとめるメインハンドラー
+│   │   ├── page_handler.go # ページ関連のハンドラー
+│   │   └── user_handler.go # ユーザー関連のハンドラー（例）
 │   └── templates/         # Goテンプレート
 │       ├── layouts/       # レイアウトテンプレート
 │       ├── pages/         # ページテンプレート
 │       ├── partials/      # 部分テンプレート
 │       └── components/    # 再利用可能なコンポーネント
 └── main.go               # エントリーポイント
+```
+
+## ハンドラー構造
+
+### ファイル構成
+- `handlers/handler.go`: すべてのハンドラーをまとめ、ルーティングを定義
+- `handlers/<機能>_handler.go`: 各機能ごとのハンドラー実装
+
+### ハンドラーの構成例
+```go
+// handler.go - メインハンドラー
+type Handler struct {
+    PageHandler *PageHandler
+    UserHandler *UserHandler
+}
+
+func NewHandler(pageService *services.PageService, userService *services.UserService) *Handler {
+    return &Handler{
+        PageHandler: NewPageHandler(pageService),
+        UserHandler: NewUserHandler(userService),
+    }
+}
+
+func (h *Handler) SetupRoutes(router *gin.Engine) {
+    // ルーティング設定
+}
+```
+
+```go
+// page_handler.go - ページハンドラー
+type PageHandler struct {
+    pageService *services.PageService
+}
+
+func NewPageHandler(pageService *services.PageService) *PageHandler {
+    return &PageHandler{pageService: pageService}
+}
 ```
 
 ## コーディング規約
@@ -100,8 +139,18 @@ if c.GetHeader("HX-Request") != "" {
 
 ## ハンドラー実装パターン
 
+### 基本的なハンドラー実装
 ```go
-func (h *Handler) GetUsers(c *gin.Context) {
+// user_handler.go
+type UserHandler struct {
+    userService *services.UserService
+}
+
+func NewUserHandler(userService *services.UserService) *UserHandler {
+    return &UserHandler{userService: userService}
+}
+
+func (h *UserHandler) GetUsers(c *gin.Context) {
     // 1. リクエストパラメータの取得とバリデーション
     
     // 2. サービス層の呼び出し
@@ -143,7 +192,10 @@ func (h *Handler) GetUsers(c *gin.Context) {
 - htmxで不要なデータ転送を削減
 
 ## 命名規則
+- ハンドラーファイル: `<機能>_handler.go` (例: `user_handler.go`, `page_handler.go`)
+- ハンドラー構造体: `<機能>Handler` (例: `UserHandler`, `PageHandler`)
 - ハンドラー関数: `GetUsers`, `CreateUser`, `UpdateUser`, `DeleteUser`
+- サービスファイル: `<機能>_service.go` (例: `user_service.go`, `page_service.go`)
 - サービスメソッド: `GetAll`, `GetByID`, `Create`, `Update`, `Delete`
 - URL: `/users`, `/users/:id`, `/users/new`, `/users/:id/edit`
 - テンプレート定義名: `pages/users`, `partials/user-card`
