@@ -1,0 +1,15 @@
+<!-- templates/pages/home.go.tmpl -->
+{{template "base.go.tmpl" .}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <h1 class="text-4xl font-bold">ようこそ、{{.User}}さん</h1>
+    
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">ホームページ</h2>
+            <p>ここはホームページのコンテンツです</p>
+        </div>
+    </div>
+</div>
+{{end}}

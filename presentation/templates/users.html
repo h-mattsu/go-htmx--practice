@@ -1,0 +1,29 @@
+{{/* Simple page that contains an htmx-enabled form and a users list. */}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Users</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  </head>
+  <body>
+    <h1>Users</h1>
+
+    <form hx-post="/users" hx-target="#users-list" hx-swap="innerHTML">
+      <label>Name: <input type="text" name="name" required></label>
+      <label>Email: <input type="email" name="email" required></label>
+      <button type="submit">Create</button>
+    </form>
+
+    <div id="users-list">
+      <ul>
+        {{- range .Users }}
+          <li>{{ .Name }} — {{ .Email }}</li>
+        {{- else }}
+          <li>No users yet</li>
+        {{- end }}
+      </ul>
+    </div>
+  </body>
+</html>
